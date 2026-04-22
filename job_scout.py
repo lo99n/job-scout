@@ -21,7 +21,7 @@ from datetime import datetime
 
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 RESEND_API_KEY = os.getenv("RESEND_API_KEY")
-RESEND_FROM = os.getenv("RESEND_FROM", "Job Scout <scout@platypus.farm>")
+RESEND_FROM = os.getenv("RESEND_FROM", "Jason de Jobscoot <scout@platypus.farm>")
 SEEN_FILE = "seen_jobs.json"
 MODEL = "claude-sonnet-4-6"
 
@@ -315,14 +315,17 @@ def build_email(data, profile_name):
         </td></tr>
         <tr><td style="height:8px;"></td></tr>"""
 
+    MASCOT_URL = "https://raw.githubusercontent.com/lo99n/job-scout/main/ChatGPT%20Image%20Apr%2022%2C%202026%2C%2009_26_41%20AM.png"
+
     return f"""
     <html><body style="margin:0;padding:0;background:#070a0f;">
     <table width="100%" cellpadding="0" cellspacing="0" style="background:#070a0f;">
     <tr><td align="center" style="padding:20px;">
     <table width="640" cellpadding="0" cellspacing="0" style="font-family:'Courier New',monospace;background:#0a0e14;color:#d4dee8;border-radius:12px;overflow:hidden;">
-        <tr><td style="padding:32px 28px 0;">
-            <span style="color:#a78bfa;font-size:10px;letter-spacing:3px;font-weight:700;">DAILY BRIEFING</span>
-            <h1 style="color:#fff;font-size:32px;margin:4px 0 0;letter-spacing:-1px;">JOB SCOUT</h1>
+        <tr><td style="padding:32px 28px 0;" align="center">
+            <img src="{MASCOT_URL}" alt="Jason de Jobscoot" width="100" height="100" style="border-radius:50%;margin-bottom:12px;">
+            <div style="color:#a78bfa;font-size:10px;letter-spacing:3px;font-weight:700;">DAILY BRIEFING FROM</div>
+            <h1 style="color:#fff;font-size:32px;margin:4px 0 0;letter-spacing:-1px;">Jason de Jobscoot</h1>
             <p style="color:#5a6a7a;font-size:11px;letter-spacing:1px;margin:6px 0 0;">{date_str} \u00b7 {len(jobs)} matches for {profile_name} \u00b7 posted in last 7 days</p>
         </td></tr>
         <tr><td style="padding:16px 28px;"><hr style="border:none;border-top:1px solid #1c2530;margin:0;"></td></tr>
@@ -330,7 +333,7 @@ def build_email(data, profile_name):
             <table width="100%" cellpadding="0" cellspacing="0">{jobs_html}</table>
         </td></tr>
         <tr><td style="padding:28px;text-align:center;">
-            <p style="color:#3a4a5a;font-size:10px;letter-spacing:1px;margin:0;">AI-curated matches. German-required jobs excluded. Verify details before applying.</p>
+            <p style="color:#3a4a5a;font-size:10px;letter-spacing:1px;margin:0;">Scouted by Jason de Jobscoot \u00b7 German-required jobs excluded \u00b7 Verify before applying</p>
         </td></tr>
     </table></td></tr></table></body></html>"""
 
@@ -341,7 +344,7 @@ def send_email(html, count, to_email, profile_name):
     params = {
         "from": RESEND_FROM,
         "to": [to_email],
-        "subject": f"Job Scout: {count} matches for {profile_name} ({date_str})",
+        "subject": f"\U0001f9a6 Jason found {count} jobs for {profile_name} ({date_str})",
         "html": html,
     }
     result = resend.Emails.send(params)
