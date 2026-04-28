@@ -315,7 +315,7 @@ def build_email(data, profile_name):
         </td></tr>
         <tr><td style="height:8px;"></td></tr>"""
 
-    MASCOT_URL = "https://raw.githubusercontent.com/lo99n/job-scout/main/ChatGPT%20Image%20Apr%2022%2C%202026%2C%2009_26_41%20AM.png"
+    MASCOT_URL = "https://raw.githubusercontent.com/lo99n/job-scout/main/jason.png"
 
     return f"""
     <html><body style="margin:0;padding:0;background:#070a0f;">
