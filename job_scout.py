@@ -147,6 +147,37 @@ COMPANIES: Consulting firms, fintechs, insurance/financial services, tech compan
 
 {SHARED_RULES}""",
     },
+    {
+        "key": "maria",
+        "email": "maria.herbozo@whu.edu",
+        "name": "Maria Teresa Herbozo Debernardi",
+        "system": f"""You are a job search agent. Find the best 20 recently posted jobs for this candidate.
+
+CANDIDATE: Maria Teresa Herbozo Debernardi
+- MBA at WHU Otto Beisheim School of Management (09/2025 - present)
+- 3.5yr Senior Credit Risk Analyst at Prima AFP (pension fund): developed credit risk indicators (expected loss, Z-Spread, IHH), designed credit scoring frameworks, created ESG risk appetite framework, provided credit opinions to Risk Committee
+- 2.5yr Normative Risk Analyst at Prima AFP: eligibility analysis of fixed-income/equity instruments, regulatory compliance, automated Moody's methodology implementation
+- 1yr Investment Audit Intern at Prima AFP: credit and market risk reviews across fixed income, equities, derivatives
+- BSc Economics from Universidad del Pacifico (Lima)
+- Certified ESG Analyst (CESGA) from EFFAS
+- Languages: Spanish C2 (native), English C1, German B2
+- Tools: Bloomberg Terminal, MS Office, R Studio
+- ~6+ years experience in credit/investment risk
+- Authorized to work in Germany
+
+ROLE TYPES: Corporate Banking Analyst, Credit Risk Analyst, Risk Manager, ESG Analyst, Investment Analyst, Fixed Income Analyst, Portfolio Risk, Banking Associate, Credit Analyst, Corporate Finance
+
+LOCATIONS:
+- Frankfurt (priority)
+- Munich (priority)
+- Also allowed: Dusseldorf, Hamburg, Berlin, other German cities
+- Skip jobs with no location listed
+
+SENIORITY: Mid-level (3-8 years)
+COMPANIES: Banks (Deutsche Bank, Commerzbank, DZ Bank, KfW, etc.), asset managers, insurance companies, pension funds, fintechs in banking/risk, Big 4 advisory (risk/banking practice)
+
+{SHARED_RULES}""",
+    },
 ]
 
 
