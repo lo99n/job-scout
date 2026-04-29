@@ -22,7 +22,7 @@ from datetime import datetime
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 RESEND_API_KEY = os.getenv("RESEND_API_KEY")
 RESEND_FROM = os.getenv("RESEND_FROM", "Jason de Jobscoot <scout@platypus.farm>")
-SEEN_FILE = "seen_jobs.json"
+SEEN_DIR = "seen_jobs"
 MODEL = "claude-sonnet-4-6"
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -184,16 +184,18 @@ COMPANIES: Banks (Deutsche Bank, Commerzbank, DZ Bank, KfW, etc.), asset manager
 # ═══════════════════════════════════════════════════════════════════
 # DEDUPLICATION
 # ═══════════════════════════════════════════════════════════════════
-def load_seen():
-    if os.path.exists(SEEN_FILE):
-        with open(SEEN_FILE, "r") as f:
+def load_seen(profile_key):
+    filepath = f"{SEEN_DIR}/{profile_key}.json"
+    if os.path.exists(filepath):
+        with open(filepath, "r") as f:
             return set(json.load(f))
     return set()
 
-def save_seen(seen):
-    with open(SEEN_FILE, "w") as f:
+def save_seen(profile_key, seen):
+    os.makedirs(SEEN_DIR, exist_ok=True)
+    filepath = f"{SEEN_DIR}/{profile_key}.json"
+    with open(filepath, "w") as f:
         json.dump(list(seen), f)
-
 
 # ═══════════════════════════════════════════════════════════════════
 # CALL CLAUDE
