@@ -449,7 +449,7 @@ def process_jobs():
                         seen.add(j["url"])
                 save_seen(profile["key"], seen)
                 log.info(f"  Seen list updated for {profile['name']}: {len(seen)} total")
-        log.info("Processing complete. Emails queued for 8:30.")eli
+        log.info("Processing complete. Emails queued for 8:30.")
 
     except Exception as e:
         log.error(f"Processing failed: {e}", exc_info=True)
