@@ -178,6 +178,40 @@ COMPANIES: Banks (Deutsche Bank, Commerzbank, DZ Bank, KfW, etc.), asset manager
 
 {SHARED_RULES}""",
     },
+    {
+        "key": "regina",
+        "email": "regina.rubio-aguilar@whu.edu",
+        "name": "Regina Rubio Aguilar",
+        "system": f"""You are a job search agent. Find the best 20 recently posted jobs for this candidate.
+
+CANDIDATE: Regina Rubio Aguilar
+- MBA at WHU Otto Beisheim School of Management (09/2025 - present), international modules at NOVA Lisbon and Kellogg Northwestern
+- 1yr Industrial Strategic Sourcing Associate Manager at Danone Mexico: led cross-functional sourcing strategy contributing to ~6M EUR net sales, negotiated first renewable energy sourcing initiative
+- 1yr+ CAPEX and 3rd-Party Manufacturing Sourcing Junior Manager at Danone: built co-manufacturing sourcing category, mitigated supplier risk generating 600K EUR savings, secured 25% cost savings on 1.5M EUR procurement
+- 1yr+ IT Sourcing Junior Manager at Danone: implemented data intelligence and process automation technologies driving 10% net sales increase, trained 60+ people on e-sourcing platform delivering 2.5M EUR savings
+- 1yr Professional Services Sourcing Trainee at Danone: market analysis, bidding coordination, 20% cost savings
+- BA International Relations from ITAM (Mexico City)
+- Languages: Spanish C2 (native), English C1, French B1, German A2
+- Tools: AI Tools and Prompt Engineering (Claude, ChatGPT), Zycus, SAP Themis, Orsoft Coupa, MS Office
+- Certifications: Negotiation Diploma (IPADE Business School)
+- ~4 years at Danone across sourcing, procurement, and strategic initiatives
+- Strong international background: Mexico, Portugal, USA (Kellogg), Germany
+- Eligible to work in Germany
+
+ROLE TYPES: Management Consultant, Strategic Planner, Marketing Manager, New Product Development Manager, Product Manager, General Manager, PR and Communications Manager, Advertising Account Manager, Retail Manager
+
+LOCATIONS:
+- Southern Germany priority: Stuttgart, Munich
+- Also allowed: Frankfurt, Dusseldorf, Cologne, Nuremberg
+- Skip jobs outside Germany
+- Skip jobs with no location listed
+- Bonus: roles that explicitly value international background
+
+SENIORITY: Junior to mid-level (2-6 years)
+COMPANIES: FMCG, consumer goods, consulting firms, retail, textile/fashion ONLY. No other industries.
+
+{SHARED_RULES}""",
+    },
 ]
 
 
@@ -400,25 +434,22 @@ def process_jobs():
     pending_results = {}
 
     try:
-        seen = load_seen()
-        log.info(f"Previously seen: {len(seen)} jobs")
-
         for profile in PROFILES:
+            seen = load_seen(profile["key"])
+            log.info(f"Previously seen for {profile['name']}: {len(seen)} jobs")
+
             data = search_for_profile(profile, seen)
             if data and data.get("jobs"):
                 pending_results[profile["key"]] = {
                     "data": data,
                     "profile": profile,
                 }
-                # Add to seen immediately so second profile doesn't get same jobs
                 for j in data["jobs"]:
                     if j.get("url"):
                         seen.add(j["url"])
-
-        # Save seen list
-        save_seen(seen)
-        log.info(f"Seen list updated: {len(seen)} total")
-        log.info("Processing complete. Emails queued for 8:30.")
+                save_seen(profile["key"], seen)
+                log.info(f"  Seen list updated for {profile['name']}: {len(seen)} total")
+        log.info("Processing complete. Emails queued for 8:30.")eli
 
     except Exception as e:
         log.error(f"Processing failed: {e}", exc_info=True)
@@ -467,9 +498,10 @@ if __name__ == "__main__":
         send_emails()
 
     elif "--reset" in sys.argv:
-        if os.path.exists(SEEN_FILE):
-            os.remove(SEEN_FILE)
-            print("Seen jobs cleared.")
+        import shutil
+        if os.path.exists(SEEN_DIR):
+            shutil.rmtree(SEEN_DIR)
+            print("All seen jobs cleared.")
         else:
             print("No seen jobs to clear.")
 
