@@ -22,6 +22,7 @@ from pathlib import Path
 from dataclasses import dataclass, field, asdict
 from typing import Optional
 from urllib.parse import urlencode, quote_plus
+from ats_integration import enrich_with_ats
 
 import requests
 from bs4 import BeautifulSoup
