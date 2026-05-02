@@ -1,0 +1,68 @@
+{
+  "global_filters": {
+    "languages_exclude": ["German C1", "German C2", "fließend Deutsch", "Deutsch Muttersprache", "verhandlungssicher Deutsch"],
+    "roles_exclude": ["software engineer", "developer", "data engineer", "devops", "sysadmin", "nurse", "doctor", "lawyer", "teacher"],
+    "location_include": ["Germany", "Berlin", "Munich", "Frankfurt", "Hamburg", "Stuttgart", "Düsseldorf", "Cologne", "Amsterdam", "London", "Paris", "Barcelona", "Madrid", "Milan", "Zurich", "Vienna", "Dublin", "Lisbon", "Europe", "Remote"],
+    "seniority_exclude": ["director", "VP", "C-level", "head of", "principal"],
+    "min_english": true,
+    "exclude_unpaid": true
+  },
+  "friends": [
+    {
+      "id": "lorenzo",
+      "name": "Lorenzo Nicastro",
+      "target_roles": ["founders associate", "business development", "sales manager", "account executive", "marketing manager", "growth manager", "partnerships manager", "community manager", "event manager", "SDR", "BDR", "commercial manager", "GTM", "go to market"],
+      "keywords": ["startup", "B2B", "SaaS", "sales", "outbound", "CRM", "events", "lead generation", "AI", "growth", "content strategy", "digital marketing"],
+      "preferred_locations": ["Berlin"],
+      "accepted_locations": ["Munich", "Hamburg", "Amsterdam", "London", "Paris", "Barcelona", "Madrid", "Milan", "Dublin", "Lisbon", "Remote"],
+      "company_types": ["startup", "scale-up", "tech"],
+      "seniority": ["entry", "junior", "associate", "mid"],
+      "min_salary": 40000,
+      "target_salary": 60000,
+      "languages": ["English C2", "Italian C2", "Spanish B1"],
+      "bonus_keywords": ["AI", "agentic", "founder", "fast-paced", "early stage", "series A", "series B"]
+    },
+    {
+      "id": "fernando",
+      "name": "Fernando Hermoza Pelizzoli",
+      "target_roles": ["product manager", "account manager", "business consultant", "management consultant", "business analyst", "project manager", "program manager", "transformation consultant", "business developer", "product owner", "PMO", "digital transformation", "strategy consultant", "associate consultant", "engagement manager"],
+      "keywords": ["consulting", "product management", "project management", "PMO", "digital transformation", "stakeholder management", "IT implementation", "core banking", "fintech", "insurance", "financial services", "vendor management", "process optimization", "change management"],
+      "preferred_locations": ["Düsseldorf", "Berlin", "Munich", "Frankfurt", "Hamburg", "Cologne"],
+      "accepted_locations": ["Amsterdam", "London", "Paris", "Zurich", "Vienna", "Remote"],
+      "company_types": ["consulting", "corporate", "fintech", "financial services", "insurance", "big4", "MBB"],
+      "seniority": ["mid", "senior", "associate", "consultant"],
+      "min_salary": null,
+      "target_salary": null,
+      "languages": ["Spanish C2", "English C1"],
+      "bonus_keywords": ["MBA", "EY", "McKinsey", "BCG", "Bain", "Deloitte", "Accenture", "core banking", "agile", "scrum"]
+    },
+    {
+      "id": "maria",
+      "name": "Maria Herbozo Debernardi",
+      "target_roles": ["credit risk analyst", "risk analyst", "ESG analyst", "investment analyst", "portfolio analyst", "credit analyst", "risk manager", "fixed income analyst", "banking analyst", "corporate banking analyst", "risk associate", "compliance analyst", "financial analyst"],
+      "keywords": ["credit risk", "ESG", "investment risk", "fixed income", "portfolio governance", "risk assessment", "regulatory compliance", "banking", "financial analysis", "Bloomberg", "corporate banking", "sustainability", "pension fund"],
+      "preferred_locations": ["Frankfurt", "Munich"],
+      "accepted_locations": ["Düsseldorf", "Berlin", "Hamburg", "Zurich", "London", "Amsterdam"],
+      "company_types": ["bank", "investment bank", "corporate bank", "asset management", "Deutsche Bank", "Commerzbank", "DZ Bank", "KfW", "BNP Paribas", "ING", "UniCredit", "Goldman Sachs", "JP Morgan", "Morgan Stanley", "HSBC", "Citi", "UBS", "Credit Suisse"],
+      "seniority": ["mid", "senior", "associate", "analyst"],
+      "min_salary": null,
+      "target_salary": null,
+      "languages": ["Spanish C2", "English C1", "German B2"],
+      "bonus_keywords": ["CESGA", "ESG", "Bloomberg Terminal", "Moody's", "S&P", "Fitch", "Basel", "IFRS"]
+    },
+    {
+      "id": "regina",
+      "name": "Regina Rubio Aguilar",
+      "target_roles": ["management consultant", "strategy consultant", "strategic planner", "marketing manager", "brand manager", "product manager", "category manager", "sourcing manager", "procurement manager", "account manager", "retail manager", "communications manager", "PR manager", "general manager", "associate consultant", "new product development"],
+      "keywords": ["strategic sourcing", "procurement", "FMCG", "consumer goods", "supply chain", "marketing strategy", "brand management", "product launch", "cost savings", "vendor negotiation", "e-sourcing", "sustainability", "consulting", "retail", "fashion", "textile"],
+      "preferred_locations": ["Stuttgart", "Munich"],
+      "accepted_locations": ["Frankfurt", "Düsseldorf", "Cologne"],
+      "company_types": ["FMCG", "consumer goods", "consulting", "retail", "textile", "fashion", "Danone", "Nestle", "Unilever", "P&G", "Henkel", "Beiersdorf", "Adidas", "Puma", "Hugo Boss", "Zalando", "McKinsey", "BCG", "Bain", "Kearney", "Roland Berger"],
+      "seniority": ["mid", "associate", "junior manager", "consultant"],
+      "min_salary": null,
+      "target_salary": null,
+      "languages": ["Spanish C2", "English C1", "French B1"],
+      "bonus_keywords": ["international", "multicultural", "cross-functional", "CAPEX", "co-manufacturing", "renewable", "ITAM", "Kellogg", "NOVA"]
+    }
+  ]
+}
