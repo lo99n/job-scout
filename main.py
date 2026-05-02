@@ -73,7 +73,7 @@ def run_script(script_path, args=None, label=""):
         return False
 
 
-def step_1_scrape(use_playwright=True, dry_run=False):
+def step_1_scrape(use_playwright=False, dry_run=False):
     """Run the scraper to find and score jobs."""
     args = []
     if use_playwright:
