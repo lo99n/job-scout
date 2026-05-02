@@ -58,7 +58,7 @@ def run_script(script_path, args=None, label=""):
             cmd,
             cwd=os.path.dirname(script_path),
             capture_output=False,  # let output flow to Railway logs
-            timeout=600,  # 10 min max per step
+            timeout=1800,  # 10 min max per step
         )
         if result.returncode != 0:
             log.error(f"{label} exited with code {result.returncode}")
