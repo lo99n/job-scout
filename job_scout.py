@@ -126,7 +126,7 @@ def read_inbox(profile_key):
 def build_email(jobs, profile_name, date_str):
     mascot_img = ""
     if MASCOT_DATA_URI:
-        mascot_img = f'<img src="{MASCOT_DATA_URI}" alt="Jason de Jobscoot" width="100" height="100" style="border-radius:50%;margin-bottom:12px;">'
+        mascot_img = f'<img src="{MASCOT_DATA_URI}" alt="Jason de Jobscoot" width="100" height="100">'
 
     jobs_html = ""
     for i, j in enumerate(jobs, 1):
