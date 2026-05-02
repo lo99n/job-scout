@@ -194,11 +194,11 @@ def process_jobs():
 
     try:
         for key, profile in PROFILES.items():
-          test_profile = os.getenv("TEST_PROFILE")
-          if test_profile and key != test_profile:
-            continue
-          seen = load_seen(key)
-          log.info(f"Reading inbox for {profile['name']} (seen: {len(seen)})")
+            test_profile = os.getenv("TEST_PROFILE")
+            if test_profile and key != test_profile:
+              continue
+            seen = load_seen(key)
+            log.info(f"Reading inbox for {profile['name']} (seen: {len(seen)})")
 
             jobs = read_inbox(key)
             if not jobs:
