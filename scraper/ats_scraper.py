@@ -75,11 +75,6 @@ NON_ENGLISH_SIGNALS = [
     # French
     "description du poste", "responsabilités", "nous offrons",
     "votre profil", "rejoignez", "candidature", "temps plein",
-    # Spanish
-    "descripción del puesto", "requisitos", "responsabilidades",
-    "ofrecemos", "jornada completa",
-    # Italian
-    "descrizione del ruolo", "requisiti", "cosa offriamo",
     # Dutch
     "functieomschrijving", "wat bied je", "wat zoeken wij",
 ]
