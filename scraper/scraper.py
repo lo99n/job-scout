@@ -873,6 +873,12 @@ def main():
                 deduped.append(job)
         all_jobs = deduped
         print(f"\n[*] Total unique jobs scraped: {len(all_jobs)}")
+        print(f"\n[*] Running ATS discovery on {len(all_jobs)} board results...")
+        seen_urls = {j.url for j in all_jobs}
+        ats_extra = enrich_with_ats(all_jobs, seen_urls=seen_urls)
+        all_jobs.extend(ats_extra)
+        print(f"  [+] ATS discovery added {len(ats_extra)} new jobs")
+        print(f"  [=] Total jobs for matching: {len(all_jobs)}")
 
         # Qualify
         qualified = []
