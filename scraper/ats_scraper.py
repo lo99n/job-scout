@@ -23,7 +23,7 @@ HEADERS = {
 }
 
 REQUEST_TIMEOUT = 15
-RATE_LIMIT_DELAY = 0.5
+RATE_LIMIT_DELAY = 0.2
 
 
 # ═══════════════════════════════════════════════════════════════
