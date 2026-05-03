@@ -89,7 +89,10 @@ def transform_job(job: dict) -> dict:
     if job.get("remote"):
         parts.append("Remote")
 
-    why = " · ".join(parts) if parts else "Matched by scraper"
+    # Use AI-generated "why" if available, otherwise build from score data
+    why = job.get("why", "")
+    if not why:
+        why = " · ".join(parts) if parts else "Matched by scraper"
 
     return {
         "title": job.get("title", "Unknown Role"),
