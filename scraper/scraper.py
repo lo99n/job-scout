@@ -775,6 +775,7 @@ def prepare_agent_payload(friend: dict, picks: list[tuple[Job, dict]]) -> dict:
             "description_preview": job.description[:500] if job.description else "",
             "tags": job.tags,
             "posted_date": job.posted_date,
+            "why": score_info.get("why", ""),
         })
     return payload
 
