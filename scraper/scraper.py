@@ -23,6 +23,7 @@ from dataclasses import dataclass, field, asdict
 from typing import Optional
 from urllib.parse import urlencode, quote_plus
 from ats_integration import enrich_with_ats
+from ai_matcher import AIJobMatcher
 
 import requests
 from bs4 import BeautifulSoup
@@ -907,13 +908,34 @@ def main():
 
     results_summary = []
 
+    ai_matcher = AIJobMatcher()
+    results_summary = []
     for friend in profiles["friends"]:
         scored = [(job, matcher.score(job, friend)) for job in all_jobs]
-        # Filter by salary for Lorenzo
+        # Filter by salary
         if friend.get("min_salary"):
             scored = [(j, s) for j, s in scored if s["salary_ok"]]
-
-        picks = distributor.pick_jobs(friend["id"], scored, n=5)
+        # Pre-filter: only send 50+ to AI
+        candidates = [(j, s) for j, s in scored if s["total"] >= 50]
+        print(f"  [{friend['name']}] {len(candidates)} candidates above 50 → AI scoring...")
+        # AI scoring
+        if candidates:
+            jobs_with_kw = [(j, s["total"]) for j, s in candidates]
+            ai_results = ai_matcher.score_batch(jobs_with_kw, friend)
+            # Rebuild scored list with blended scores + why
+            scored_ai = []
+            for ai_r in ai_results:
+                job = ai_r["job"]
+                # Find original score_info to preserve breakdown
+                orig = next((s for j, s in candidates if j is job), {})
+                orig["total"] = ai_r["final_score"]
+                orig["ai_score"] = ai_r["ai_score"]
+                orig["why"] = ai_r["why"]
+                scored_ai.append((job, orig))
+            scored_ai.sort(key=lambda x: x[1]["total"], reverse=True)
+        else:
+            scored_ai = []
+        picks = distributor.pick_jobs(friend["id"], scored_ai, n=5)
 
         if dry_run:
             print(f"  [{friend['name']}] Would deliver {len(picks)} jobs (top score: {picks[0][1]['total'] if picks else 0})")
@@ -921,7 +943,10 @@ def main():
             csv_path, md_path = generate_output(friend, picks, OUTPUT_DIR)
             print(f"  [{friend['name']}] {len(picks)} jobs → {csv_path.name}")
             for i, (job, score_info) in enumerate(picks, 1):
+                why = score_info.get('why', '')
                 print(f"    {i}. [{score_info['total']:3d}] {job.title} @ {job.company} ({job.source})")
+                if why:
+                    print(f"        → {why}")
 
             # Write agent queue payload
             if not no_agent:
