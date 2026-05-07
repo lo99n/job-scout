@@ -540,12 +540,11 @@ class JobQualifier:
     def __init__(self, global_filters: dict):
         self.filters = global_filters
 
-    def qualifies(self, job) -> tuple:
+    def qualifies(self, job: Job) -> tuple[bool, str]:
         """Returns (passes, reason_if_rejected)"""
         text = f"{job.title} {job.description}".lower()
 
-        # Check German language requirement (using the stricter v2 filter)
-        from ats_scraper import requires_german
+        # Check German language requirement (stricter v2 filter)
         if requires_german(job.title, job.description):
             return False, "German required"
 
@@ -565,7 +564,6 @@ class JobQualifier:
                 return False, "Unpaid position"
 
         return True, ""
-
 
 # ── Friend Matcher ──────────────────────────────────────────────────────────
 
