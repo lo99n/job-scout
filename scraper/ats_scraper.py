@@ -1,8 +1,8 @@
 """
-ATS DISCOVERY SCRAPER
-======================
-Discovers Greenhouse, Lever, Ashby career pages and pulls open roles.
-Includes filters for location, seniority, recency, and language.
+ATS DISCOVERY SCRAPER (updated filters)
+=========================================
+Stricter language filtering — catches German-language postings,
+not just explicit "German required" phrases.
 """
 
 import re
@@ -27,7 +27,7 @@ RATE_LIMIT_DELAY = 0.2
 
 
 # ═══════════════════════════════════════════════════════════════
-# JOB FILTERS
+# JOB FILTERS (v2 — stricter language detection)
 # ═══════════════════════════════════════════════════════════════
 
 EUROPE_LOCATIONS = [
@@ -56,32 +56,120 @@ EUROPE_LOCATIONS = [
 SENIOR_KEYWORDS = [
     "senior", "sr.", "sr ", "lead", "principal", "staff", "head of",
     "director", "vp ", "vice president", "c-level", "chief",
-    "manager,", "manager -", "manager –",  # "manager" alone could be mid-level
+    "manager,", "manager -", "manager –",
     "architect",
 ]
 
-# Titles that indicate mid-level or below (override senior keywords)
 MID_OR_BELOW_KEYWORDS = [
     "junior", "jr.", "jr ", "associate", "analyst", "coordinator",
     "specialist", "assistant", "intern", "trainee", "graduate",
     "entry", "werkstudent", "working student",
 ]
 
-NON_ENGLISH_SIGNALS = [
-    # German
+# ── German language detection (v2 — much more aggressive) ──
+
+# Explicit German requirement phrases (EN + DE)
+GERMAN_REQUIRED_PATTERNS = [
+    re.compile(p, re.IGNORECASE) for p in [
+        r"german\s*(c1|c2|native|fluent|mother\s*tongue|muttersprache)",
+        r"flie[ßs]end\s*deutsch",
+        r"verhandlungssicher\s*deutsch",
+        r"deutsch\s*(c1|c2|muttersprachlich|erforderlich|zwingend|vorausgesetzt)",
+        r"german\s*language\s*(required|essential|mandatory|necessary|needed)",
+        r"must\s*speak\s*german",
+        r"fluency\s*in\s*german\s*(is\s*)?(required|essential|mandatory)",
+        r"german\s*(is\s*)?(required|essential|a\s*must)",
+        r"native[\s-]*level\s*german",
+        r"business[\s-]*level\s*german",
+        r"proficient\s*in\s*german",
+        r"excellent\s*(command\s*of|knowledge\s*of)\s*german",
+        r"deutschkenntnisse\s*(erforderlich|zwingend|erwünscht|vorausgesetzt|von vorteil)",
+        r"sehr\s*gute\s*deutschkenntnisse",
+        r"gute\s*deutschkenntnisse",
+        r"sprache.*deutsch.*erforderlich",
+    ]
+]
+
+# Words/phrases that only appear in German-language text
+# If we find enough of these, the posting itself is in German
+GERMAN_LANGUAGE_SIGNALS = [
+    # Headings and section titles
     "stellenbeschreibung", "aufgaben", "anforderungen", "wir bieten",
     "deine aufgaben", "dein profil", "was wir bieten", "bewerbung",
+    "über uns", "ihr profil", "ihre aufgaben", "unser angebot",
+    "was dich erwartet", "was du mitbringst", "darauf kannst du dich freuen",
+    "das erwartet dich", "das bringst du mit",
+    # Common job description words
     "arbeitsort", "festanstellung", "vollzeit", "teilzeit",
+    "berufserfahrung", "abgeschlossenes studium", "idealerweise",
+    "eigenverantwortlich", "teamfähigkeit", "kommunikationsstärke",
+    "selbstständig", "verantwortungsbewusst", "belastbar",
+    "bewerben sie sich", "bewirb dich", "freuen uns auf",
+    "ab sofort", "zum nächstmöglichen zeitpunkt", "unbefristet",
+    "wir suchen", "zur verstärkung", "mitarbeiter", "mitarbeiterin",
+    # Verbs and grammar that are distinctly German
+    "und", "oder", "für", "mit", "bei", "nach",
+    "werden", "haben", "sind", "können",
+]
+
+# Non-English signals (French, Dutch, etc.)
+NON_ENGLISH_SIGNALS = [
     # French
     "description du poste", "responsabilités", "nous offrons",
     "votre profil", "rejoignez", "candidature", "temps plein",
+    "nous recherchons", "vous êtes", "expérience souhaitée",
     # Dutch
     "functieomschrijving", "wat bied je", "wat zoeken wij",
+    "jouw profiel", "wij bieden", "solliciteren",
 ]
 
 
+def _count_german_signals(text: str) -> int:
+    """Count how many German-language signals appear in text."""
+    text_lower = text.lower()
+    count = 0
+    for signal in GERMAN_LANGUAGE_SIGNALS:
+        if signal in text_lower:
+            count += 1
+    return count
+
+
+def requires_german(title: str, description: str) -> bool:
+    """
+    Check if a job requires German — either explicitly stated or
+    because the posting is written in German.
+    """
+    full_text = f"{title} {description}"
+
+    # Check explicit requirement patterns
+    for pattern in GERMAN_REQUIRED_PATTERNS:
+        if pattern.search(full_text):
+            return True
+
+    # Check if the posting itself is in German
+    # We look at the description only (title might have German city names)
+    if description:
+        german_signal_count = _count_german_signals(description)
+        # If we find 5+ German signals, it's a German-language posting
+        if german_signal_count >= 5:
+            return True
+
+        # Also check: if common German structural words appear frequently,
+        # it's likely a German posting. Count "und", "oder", "für", "mit"
+        # but only if they appear as whole words
+        desc_lower = description.lower()
+        german_word_count = 0
+        for word in ["und", "oder", "für", "mit", "bei", "nach", "werden", "haben", "sind", "können"]:
+            # Match as whole words only
+            if re.search(rf'\b{word}\b', desc_lower):
+                german_word_count += 1
+        if german_word_count >= 6:
+            return True
+
+    return False
+
+
 def is_europe_or_remote(location: str) -> bool:
-    """Check if location is in Europe or remote."""
     if not location:
         return False
     loc = location.lower()
@@ -89,58 +177,56 @@ def is_europe_or_remote(location: str) -> bool:
 
 
 def is_mid_level_or_below(title: str) -> bool:
-    """Check if title is mid-level or below (not senior/lead/director)."""
     t = title.lower()
-    # If it has explicit junior/associate/etc, it's mid or below
     if any(kw in t for kw in MID_OR_BELOW_KEYWORDS):
         return True
-    # If it has senior/lead/director/etc, it's above mid
     if any(kw in t for kw in SENIOR_KEYWORDS):
         return False
-    # No signal either way → assume mid-level, include it
     return True
 
 
 def is_recent(posted_date: str, max_days: int = 15) -> bool:
-    """Check if posted within the last N days."""
     if not posted_date:
-        return True  # no date = include (benefit of the doubt)
+        return True
     try:
-        # Handle various date formats
         for fmt in ["%Y-%m-%d", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M:%S.%f"]:
             try:
                 dt = datetime.strptime(posted_date[:len("2026-05-02T00:00:00.000")], fmt)
                 return (datetime.now() - dt).days <= max_days
             except ValueError:
                 continue
-        # Try millisecond timestamp (Lever uses this)
         if posted_date.isdigit() and len(posted_date) >= 10:
             dt = datetime.fromtimestamp(int(posted_date) / 1000)
             return (datetime.now() - dt).days <= max_days
-        return True  # can't parse = include
+        return True
     except Exception:
         return True
 
 
 def is_english(description: str) -> bool:
-    """Check if description is primarily in English."""
+    """Check if description is primarily in English (not German, French, Dutch, etc.)."""
     if not description:
         return True
     desc_lower = description.lower()
+
+    # Check non-English signals (French, Dutch)
     non_english_hits = sum(1 for signal in NON_ENGLISH_SIGNALS if signal in desc_lower)
-    return non_english_hits < 3  # allow 1-2 stray words
+    if non_english_hits >= 2:
+        return False
+
+    return True
 
 
 def filter_job(title: str, location: str, description: str, posted_date: str) -> tuple[bool, str]:
-    """
-    Apply all filters. Returns (passes, reason).
-    """
+    """Apply all filters. Returns (passes, reason)."""
     if not is_europe_or_remote(location):
         return False, "not_europe"
     if not is_mid_level_or_below(title):
         return False, "too_senior"
     if not is_recent(posted_date):
         return False, "too_old"
+    if requires_german(title, description):
+        return False, "requires_german"
     if not is_english(description):
         return False, "not_english"
     return True, ""
@@ -277,7 +363,6 @@ class LeverScraper:
         for j in data:
             location = j.get("categories", {}).get("location", "")
             desc = j.get("descriptionPlain", "")
-            # Lever gives createdAt as millisecond timestamp
             created = j.get("createdAt", "")
             posted = str(created) if created else ""
 
@@ -381,8 +466,6 @@ class AshbyScraper:
 # ═══════════════════════════════════════════════════════════════
 
 class ATSCache:
-    """Remembers which ATS each company uses. Stores misses too."""
-
     def __init__(self, cache_path: str = "ats_cache.json"):
         self.path = cache_path
         self.data = self._load()
@@ -458,12 +541,8 @@ class ATSDiscovery:
         return []
 
     def discover_and_scrape(self, company_names: list[str], apply_filters: bool = True) -> list[ATSJob]:
-        """
-        Discover ATS for companies, scrape jobs, optionally filter.
-        Returns filtered ATSJob list.
-        """
         all_jobs = []
-        filter_stats = {"not_europe": 0, "too_senior": 0, "too_old": 0, "not_english": 0}
+        filter_stats = {"not_europe": 0, "too_senior": 0, "too_old": 0, "requires_german": 0, "not_english": 0}
 
         unique = list(dict.fromkeys([c.strip() for c in company_names if c.strip()]))
         log.info(f"[ATS Discovery] Processing {len(unique)} unique companies")
@@ -501,14 +580,11 @@ class ATSDiscovery:
             log.info(f"  Filtered out — not Europe/remote: {filter_stats['not_europe']}")
             log.info(f"  Filtered out — too senior: {filter_stats['too_senior']}")
             log.info(f"  Filtered out — too old (>15 days): {filter_stats['too_old']}")
+            log.info(f"  Filtered out — requires German: {filter_stats['requires_german']}")
             log.info(f"  Filtered out — not English: {filter_stats['not_english']}")
 
         return all_jobs
 
-
-# ═══════════════════════════════════════════════════════════════
-# STANDALONE TEST
-# ═══════════════════════════════════════════════════════════════
 
 if __name__ == "__main__":
     test_companies = ["n8n", "Personio", "Notion", "Mistral AI", "Linear"]
