@@ -538,28 +538,15 @@ class JobQualifier:
 
     def __init__(self, global_filters: dict):
         self.filters = global_filters
-        self._german_patterns = [
-            re.compile(p, re.IGNORECASE)
-            for p in [
-                r"german\s*(c1|c2|native|fluent|mother\s*tongue|muttersprache)",
-                r"flie[ßs]end\s*deutsch",
-                r"verhandlungssicher\s*deutsch",
-                r"deutsch\s*(c1|c2|muttersprachlich)",
-                r"german\s*language\s*required",
-                r"must\s*speak\s*german",
-                r"fluency\s*in\s*german\s*(is\s*)?(required|essential|mandatory)",
-            ]
-        ]
 
-    def qualifies(self, job: Job) -> tuple[bool, str]:
+    def qualifies(self, job) -> tuple:
         """Returns (passes, reason_if_rejected)"""
         text = f"{job.title} {job.description}".lower()
 
-        # Check German language requirement
-        full_text = f"{job.title} {job.description}"
-        for pattern in self._german_patterns:
-            if pattern.search(full_text):
-                return False, "German C1+ required"
+        # Check German language requirement (using the stricter v2 filter)
+        from ats_scraper import requires_german
+        if requires_german(job.title, job.description):
+            return False, "German required"
 
         # Check excluded roles
         for role in self.filters.get("roles_exclude", []):
