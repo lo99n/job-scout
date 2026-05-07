@@ -912,14 +912,19 @@ def main():
             ai_results = ai_matcher.score_batch(jobs_with_kw, friend)
             # Rebuild scored list with blended scores + why
             scored_ai = []
+            rejected_count = 0
             for ai_r in ai_results:
+                if ai_r.get("rejected"):
+                    rejected_count += 1
+                    continue
                 job = ai_r["job"]
-                # Find original score_info to preserve breakdown
                 orig = next((s for j, s in candidates if j is job), {})
                 orig["total"] = ai_r["final_score"]
                 orig["ai_score"] = ai_r["ai_score"]
                 orig["why"] = ai_r["why"]
                 scored_ai.append((job, orig))
+            if rejected_count:
+                print(f"    AI rejected {rejected_count} jobs (language/requirements)")
             scored_ai.sort(key=lambda x: x[1]["total"], reverse=True)
         else:
             scored_ai = []
