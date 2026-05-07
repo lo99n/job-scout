@@ -24,6 +24,7 @@ from typing import Optional
 from urllib.parse import urlencode, quote_plus
 from ats_integration import enrich_with_ats
 from ai_matcher import AIJobMatcher
+from ats_scraper import requires_german
 
 import requests
 from bs4 import BeautifulSoup
