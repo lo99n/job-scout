@@ -507,28 +507,8 @@ def main():
         scrapers = [
             ArbeitnowScraper(),
             RemoteOKScraper(),
-            StartupJobsScraper(),
-            EuroTechJobsScraper(),
-            IndeedScraper(),
         ]
-
-        # JS-heavy boards: use Playwright if requested, otherwise fall back to static
-        if use_playwright:
-            try:
-                from scraper_playwright import get_playwright_scrapers
-                pw_scrapers = get_playwright_scrapers()
-                if pw_scrapers:
-                    scrapers.extend(pw_scrapers)
-                    print(f"  [+] Playwright scrapers loaded: {[s.name for s in pw_scrapers]}")
-                else:
-                    print("  [!] Playwright not available, using static scrapers for Otta/Glassdoor/WTTJ")
-                    scrapers.extend([WelcomeToTheJungleScraper(), OttaScraper(), GlassdoorScraper()])
-            except ImportError:
-                print("  [!] scraper_playwright.py not found, using static scrapers")
-                scrapers.extend([WelcomeToTheJungleScraper(), OttaScraper(), GlassdoorScraper()])
-        else:
-            scrapers.extend([WelcomeToTheJungleScraper(), OttaScraper(), GlassdoorScraper()])
-
+        
         # Scrape each board
         for scraper in scrapers:
             print(f"\n[*] Scraping {scraper.name}...")
