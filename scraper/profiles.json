@@ -28,7 +28,7 @@
       "target_roles": ["product manager", "account manager", "business consultant", "management consultant", "business analyst", "project manager", "program manager", "transformation consultant", "business developer", "product owner", "PMO", "digital transformation", "strategy consultant", "associate consultant", "engagement manager"],
       "keywords": ["consulting", "product management", "project management", "PMO", "digital transformation", "stakeholder management", "IT implementation", "core banking", "fintech", "insurance", "financial services", "vendor management", "process optimization", "change management"],
       "preferred_locations": ["Düsseldorf", "Berlin", "Munich", "Frankfurt", "Hamburg", "Cologne"],
-      "accepted_locations": ["Amsterdam", "London", "Paris", "Zurich", "Vienna", "Remote"],
+      "accepted_locations": ["Amsterdam", "London", "Paris", "Zurich", "Vienna"],
       "company_types": ["consulting", "corporate", "fintech", "financial services", "insurance", "big4", "MBB"],
       "seniority": ["mid", "senior", "associate", "consultant"],
       "min_salary": null,
