@@ -25,6 +25,7 @@ from urllib.parse import urlencode, quote_plus
 from ats_integration import enrich_with_ats
 from ai_matcher import AIJobMatcher
 from ats_scraper import requires_german
+from supabase_profiles import load_profiles
 
 import requests
 from bs4 import BeautifulSoup
@@ -484,8 +485,7 @@ def main():
     print("=" * 60)
 
     # Load profiles
-    with open(PROFILES_FILE) as f:
-        profiles = json.load(f)
+    profiles = load_profiles()
 
     qualifier = JobQualifier(profiles["global_filters"])
     matcher = FriendMatcher()
