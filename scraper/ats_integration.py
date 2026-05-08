@@ -61,6 +61,11 @@ SECTOR_SEEDS = {
         "Scalable Capital", "Raisin", "Solaris", "Pleo", "Qonto",
         "Adyen", "Mollie", "Klarna", "Checkout", "Monzo",
         "Stripe", "Plaid", "Robinhood", "Affirm", "Brex",
+        "Deutsche Bank", "Commerzbank", "DZ Bank", "KfW",
+        "BNP Paribas", "ING", "UniCredit", "Goldman Sachs",
+        "JP Morgan", "Morgan Stanley", "HSBC", "Citi",
+        "UBS", "Credit Suisse", "Berenberg", "LBBW",
+        "Helaba", "DekaBank", "Union Investment", "Allianz Global Investors",
     ],
     "saas": [
         "Personio", "Celonis", "ContentSquare", "Datadog", "Miro",
