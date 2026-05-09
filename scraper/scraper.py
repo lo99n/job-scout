@@ -566,37 +566,30 @@ def main():
     results_summary = []
     for friend in profiles["friends"]:
         scored = [(job, matcher.score(job, friend)) for job in all_jobs]
-        # Filter by salary
         if friend.get("min_salary"):
             scored = [(j, s) for j, s in scored if s["salary_ok"]]
-        # Pre-filter: only send 50+ to AI
         candidates = [(j, s) for j, s in scored if s["total"] >= 50]
         print(f"  [{friend['name']}] {len(candidates)} candidates above 50 → AI scoring...")
-        # AI scoring
         if candidates:
             jobs_with_kw = [(j, s["total"]) for j, s in candidates]
             ai_results = ai_matcher.score_batch(jobs_with_kw, friend)
-            # Rebuild scored list with blended scores + why
             scored_ai = []
-            rejected_count = 0
-            # Step 3: use blended score + "why", filter rejections
-        for ai_result in ai_results:
-            if ai_result["rejected"] or ai_result["final_score"] == 0:
-                continue
-            job = ai_result["job"]
-            orig = next((s for j, s in candidates if j is job), {})
-            orig["total"] = ai_result["final_score"]
-            orig["ai_score"] = ai_result["ai_score"]
-            orig["why"] = ai_result["why"]
-            orig["fit"] = ai_result["fit"]
-            orig["want"] = ai_result["want"]
-            scored_ai.append((job, orig))
-        scored_ai.sort(key=lambda x: x[1]["total"], reverse=True)
-        print(f"  [{friend['name']}] {len(ai_results) - len(scored_ai)} rejected by AI, {len(scored_ai)} final matches")
+            for ai_result in ai_results:
+                if ai_result["rejected"] or ai_result["final_score"] == 0:
+                    continue
+                job = ai_result["job"]
+                orig = next((s for j, s in candidates if j is job), {})
+                orig["total"] = ai_result["final_score"]
+                orig["ai_score"] = ai_result["ai_score"]
+                orig["why"] = ai_result["why"]
+                orig["fit"] = ai_result["fit"]
+                orig["want"] = ai_result["want"]
+                scored_ai.append((job, orig))
+            scored_ai.sort(key=lambda x: x[1]["total"], reverse=True)
+            print(f"  [{friend['name']}] {len(ai_results) - len(scored_ai)} rejected by AI, {len(scored_ai)} final matches")
         else:
             scored_ai = []
         picks = distributor.pick_jobs(friend["id"], scored_ai, n=5)
-
         if dry_run:
             print(f"  [{friend['name']}] Would deliver {len(picks)} jobs (top score: {picks[0][1]['total'] if picks else 0})")
         else:
