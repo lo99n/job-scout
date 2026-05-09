@@ -19,7 +19,7 @@ import requests
 log = logging.getLogger("ai_matcher")
 
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-MODEL = "claude-sonnet-5"
+MODEL = "claude-sonnet-4-6"
 API_URL = "https://api.anthropic.com/v1/messages"
 MAX_RETRIES = 2
 RETRY_DELAY = 2
