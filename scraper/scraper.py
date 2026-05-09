@@ -579,16 +579,20 @@ def main():
             # Rebuild scored list with blended scores + why
             scored_ai = []
             rejected_count = 0
-            for ai_r in ai_results:
-                if ai_r.get("rejected"):
-                    rejected_count += 1
-                    continue
-                job = ai_r["job"]
-                orig = next((s for j, s in candidates if j is job), {})
-                orig["total"] = ai_r["final_score"]
-                orig["ai_score"] = ai_r["ai_score"]
-                orig["why"] = ai_r["why"]
-                scored_ai.append((job, orig))
+            # Step 3: use blended score + "why", filter rejections
+        for ai_result in ai_results:
+            if ai_result["rejected"] or ai_result["final_score"] == 0:
+                continue
+            job = ai_result["job"]
+            orig = next((s for j, s in candidates if j is job), {})
+            orig["total"] = ai_result["final_score"]
+            orig["ai_score"] = ai_result["ai_score"]
+            orig["why"] = ai_result["why"]
+            orig["fit"] = ai_result["fit"]
+            orig["want"] = ai_result["want"]
+            scored_ai.append((job, orig))
+        scored_ai.sort(key=lambda x: x[1]["total"], reverse=True)
+        print(f"  [{friend['name']}] {len(ai_results) - len(scored_ai)} rejected by AI, {len(scored_ai)} final matches")
             if rejected_count:
                 print(f"    AI rejected {rejected_count} jobs (language/requirements)")
             scored_ai.sort(key=lambda x: x[1]["total"], reverse=True)
