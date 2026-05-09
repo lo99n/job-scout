@@ -1,4 +1,4 @@
-"
+"""
 SUPABASE PROFILE LOADER
 =========================
 Reads profiles from Supabase and returns the same dict structure
@@ -98,6 +98,7 @@ def load_profiles() -> dict:
                 "target_salary": row.get("target_salary"),
                 "languages": row.get("languages") or [],
                 "bonus_keywords": row.get("bonus_keywords") or [],
+                "cv_parsed": row.get("cv_parsed") or {},
             })
 
         log.info(f"Loaded {len(friends)} active profiles from Supabase")
