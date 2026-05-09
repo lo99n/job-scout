@@ -593,9 +593,6 @@ def main():
             scored_ai.append((job, orig))
         scored_ai.sort(key=lambda x: x[1]["total"], reverse=True)
         print(f"  [{friend['name']}] {len(ai_results) - len(scored_ai)} rejected by AI, {len(scored_ai)} final matches")
-            if rejected_count:
-                print(f"    AI rejected {rejected_count} jobs (language/requirements)")
-            scored_ai.sort(key=lambda x: x[1]["total"], reverse=True)
         else:
             scored_ai = []
         picks = distributor.pick_jobs(friend["id"], scored_ai, n=5)
