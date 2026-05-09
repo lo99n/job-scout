@@ -607,7 +607,7 @@ def main():
             print(f"  [{friend['name']}] {len(picks)} jobs → {csv_path.name}")
             for i, (job, score_info) in enumerate(picks, 1):
                 why = score_info.get('why', '')
-                print(f"    {i}. [{score_info['total']:3d}] {job.title} @ {job.company} ({job.source})")
+                print(f"    {i}. [{score_info['total']:3d}] (fit:{score_info.get('fit','?')} want:{score_info.get('want','?')}) {job.title} @ {job.company}")
                 if why:
                     print(f"        → {why}")
 
