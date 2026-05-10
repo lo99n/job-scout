@@ -388,7 +388,7 @@ def generate_output(friend: dict, picks: list[tuple[Job, dict]], output_dir: Pat
         writer.writerow(["Rank", "Score", "Title", "Company", "Location", "URL", "Matched Role", "Source", "Why"])
         for i, (job, score_info) in enumerate(picks, 1):
             breakdown = score_info["breakdown"]
-            why = f"Role:{breakdown['role']} Kw:{breakdown['keywords']} Loc:{breakdown['location']} Co:{breakdown['company']} Bonus:{breakdown['bonus']}"
+            why = f"Role:{breakdown.get('role',0)} Kw:{breakdown.get('keywords', breakdown.get('keyword',0))} Loc:{breakdown.get('location',0)} Co:{breakdown.get('company',0)} Bonus:{breakdown.get('bonus',0)}"
             writer.writerow([
                 i, score_info["total"], job.title, job.company,
                 job.location, job.url, score_info.get("matched_role", ""),
