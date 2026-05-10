@@ -87,6 +87,13 @@ GERMAN_REQUIRED_PATTERNS = [
         r"sehr\s*gute\s*deutschkenntnisse",
         r"gute\s*deutschkenntnisse",
         r"sprache.*deutsch.*erforderlich",
+        r"skills\s*in\s*german.*(?:required|c1|c2|fluent)",
+        r"german\s*and\s*english.*(?:c1|c2|required|mandatory)",
+        r"in\s*german\s*and\s*english.*(?:required|c1|c2)",
+        r"(?:c1|c2)\s*level\s*required\s*for\s*both",
+        r"minimum\s*c1.*german",
+        r"german.*minimum\s*c1",
+        r"DACH\s*market.*german",
     ]
 ]
 
