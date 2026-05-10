@@ -659,31 +659,31 @@ def run_backfill(backfill_file: str):
         print(f"  [!] Profile {profile_key} not found")
         return
     
-    # Import ATS scraper directly
-    from ats_scraper import discover_ats, fetch_ats_jobs, filter_ats_jobs
+    from ats_scraper import ATSDiscovery
+    
+    discovery = ATSDiscovery()
+    ats_jobs = discovery.discover_and_scrape(companies, apply_filters=True)
+    
+    if not ats_jobs:
+        print("  [!] No backfill jobs found")
+        return
+    
+    # Convert ATS jobs to Job objects
+    all_jobs = []
+    for aj in ats_jobs:
+        all_jobs.append(Job(
+            title=aj.title,
+            company=aj.company,
+            location=aj.location,
+            url=aj.url,
+            description=aj.description or "",
+            source=f"ats-backfill-{aj.ats_platform}",
+        ))
     
     qualifier = JobQualifier(profiles["global_filters"])
     matcher = FriendMatcher()
     distributor = Distributor(SEEN_FILE)
     ai_matcher = AIJobMatcher()
-    
-    all_jobs = []
-    for company in companies:
-        try:
-            ats_info = discover_ats(company)
-            if not ats_info:
-                continue
-            platform, slug = ats_info
-            raw_jobs = fetch_ats_jobs(platform, slug, company)
-            filtered = filter_ats_jobs(raw_jobs, platform, company)
-            all_jobs.extend(filtered)
-            print(f"    {company} ({platform}): {len(filtered)} after filters")
-        except Exception as e:
-            print(f"    {company}: error — {e}")
-    
-    if not all_jobs:
-        print("  [!] No backfill jobs found")
-        return
     
     # Qualify
     qualified = [j for j in all_jobs if qualifier.qualifies(j)[0]]
