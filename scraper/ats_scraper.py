@@ -192,7 +192,7 @@ def is_mid_level_or_below(title: str) -> bool:
     return True
 
 
-def is_recent(posted_date: str, max_days: int = 15) -> bool:
+def is_recent(posted_date: str, max_days: int = 30) -> bool:
     if not posted_date:
         return True
     try:
