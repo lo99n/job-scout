@@ -322,7 +322,8 @@ def full_pipeline(dry_run=False):
 
     # Step 1.5: Backfill (check counts, targeted ATS for underserved profiles)
     if ORCHESTRATOR_AVAILABLE and profiles and not dry_run:
-        step_1_5_backfill(profiles, strategy)
+        profile_list = profiles.get("friends", profiles) if isinstance(profiles, dict) else profiles
+        step_1_5_backfill(profile_list, strategy)
 
     # Step 2: Bridge
     if not step_2_bridge(dry_run=dry_run):
