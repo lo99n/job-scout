@@ -288,14 +288,6 @@ class FriendMatcher:
                 matched_role = role
         scores["role"] = role_score
 
-        # Generate search terms — prefer AI strategy if available
-        strategy = load_strategy() if ORCHESTRATOR_AVAILABLE else None
-        if strategy:
-            print(f"\n[*] Using AI strategy: {len(search_terms)} search terms")
-        else:
-            search_terms = generate_search_terms(profiles)
-            print(f"\n[*] Using static terms: {len(search_terms)} search terms")
-
         # Location match (0-20)
         loc_score = 0
         if any(loc.lower() in location_lower for loc in friend.get("preferred_locations", [])):
@@ -509,9 +501,14 @@ def main():
             all_jobs = [Job.from_dict(j) for j in json.load(f)]
         print(f"    Loaded {len(all_jobs)} cached jobs")
     else:
-        # Generate search terms
-        search_terms = generate_search_terms(profiles)
-        print(f"\n[*] Generated {len(search_terms)} search terms")
+        # Generate search terms — prefer AI strategy if available
+        strategy = load_strategy() if ORCHESTRATOR_AVAILABLE else None
+        if strategy:
+            search_terms = get_search_terms_from_strategy(strategy, profiles)
+            print(f"\n[*] Using AI strategy: {len(search_terms)} search terms")
+        else:
+            search_terms = generate_search_terms(profiles)
+            print(f"\n[*] Using static terms: {len(search_terms)} search terms")
 
         # Initialize scrapers — static HTML boards always run
         scrapers = [
