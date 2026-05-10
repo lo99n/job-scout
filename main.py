@@ -314,7 +314,7 @@ def full_pipeline(dry_run=False):
     # Step 0: AI Strategy
     strategy = None
     if ORCHESTRATOR_AVAILABLE and profiles:
-        strategy = step_0_orchestrate(profiles)
+        strategy = step_0_orchestrate(profiles.get("friends", profiles) if isinstance(profiles, dict) else profiles)
 
     # Step 1: Scrape (uses ai_strategy.json if present)
     if not step_1_scrape(use_playwright=False, dry_run=dry_run):
