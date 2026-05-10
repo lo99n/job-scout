@@ -48,7 +48,11 @@ def generate_search_strategy(profiles: list[dict]) -> dict:
 
     # Build profile summaries
     profile_summaries = []
-    for p in profiles:
+    if isinstance(profiles, dict):
+      profile_list = profiles.get("friends", [])
+    else:
+      profile_list = profiles
+    for p in profile_list:
         cv = p.get("cv_parsed") or {}
         summary = {
             "name": p["name"],
