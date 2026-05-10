@@ -291,7 +291,6 @@ class FriendMatcher:
         # Generate search terms — prefer AI strategy if available
         strategy = load_strategy() if ORCHESTRATOR_AVAILABLE else None
         if strategy:
-            search_terms = get_search_terms_from_strategy(strategy, profiles)
             print(f"\n[*] Using AI strategy: {len(search_terms)} search terms")
         else:
             search_terms = generate_search_terms(profiles)
