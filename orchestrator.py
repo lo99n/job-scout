@@ -25,7 +25,7 @@ import requests
 
 log = logging.getLogger("orchestrator")
 
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+ANTHROPIC_API_KEY = os.getenv("ORCHESTRATOR_API_KEY", os.getenv("ANTHROPIC_API_KEY", ""))
 MODEL = "claude-sonnet-4-5"
 API_URL = "https://api.anthropic.com/v1/messages"
 STRATEGY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "scraper", "ai_strategy.json")
