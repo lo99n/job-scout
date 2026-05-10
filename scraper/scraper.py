@@ -26,6 +26,12 @@ from ats_integration import enrich_with_ats
 from ai_matcher import AIJobMatcher
 from ats_scraper import requires_german
 from supabase_profiles import load_profiles
+try:
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+    from orchestrator import load_strategy, get_search_terms_from_strategy
+    ORCHESTRATOR_AVAILABLE = True
+except ImportError:
+    ORCHESTRATOR_AVAILABLE = False
 
 import requests
 from bs4 import BeautifulSoup
@@ -282,9 +288,14 @@ class FriendMatcher:
                 matched_role = role
         scores["role"] = role_score
 
-        # Keyword match (0-25)
-        kw_hits = sum(1 for kw in friend["keywords"] if kw.lower() in text)
-        scores["keywords"] = min(25, int(kw_hits / max(len(friend["keywords"]), 1) * 50))
+        # Generate search terms — prefer AI strategy if available
+        strategy = load_strategy() if ORCHESTRATOR_AVAILABLE else None
+        if strategy:
+            search_terms = get_search_terms_from_strategy(strategy, profiles)
+            print(f"\n[*] Using AI strategy: {len(search_terms)} search terms")
+        else:
+            search_terms = generate_search_terms(profiles)
+            print(f"\n[*] Using static terms: {len(search_terms)} search terms")
 
         # Location match (0-20)
         loc_score = 0
@@ -635,6 +646,82 @@ def main():
         print(f"  Agent payloads in: {AGENT_OUTPUT_DIR}/")
     print(f"{'=' * 60}")
 
+def run_backfill(backfill_file: str):
+    """ATS-only scrape for specific companies targeting one profile."""
+    with open(backfill_file) as f:
+        config = json.load(f)
+    
+    profile_key = config["profile_key"]
+    companies = config["companies"]
+    loop = config.get("loop", 1)
+    
+    print(f"\n[*] BACKFILL (loop {loop}) for {profile_key}: {len(companies)} companies")
+    
+    profiles = load_profiles()
+    friend = next((f for f in profiles["friends"] if f["id"] == profile_key), None)
+    if not friend:
+        print(f"  [!] Profile {profile_key} not found")
+        return
+    
+    # Import ATS scraper directly
+    from ats_scraper import discover_ats, fetch_ats_jobs, filter_ats_jobs
+    
+    qualifier = JobQualifier(profiles["global_filters"])
+    matcher = FriendMatcher()
+    distributor = Distributor(SEEN_FILE)
+    ai_matcher = AIJobMatcher()
+    
+    all_jobs = []
+    for company in companies:
+        try:
+            ats_info = discover_ats(company)
+            if not ats_info:
+                continue
+            platform, slug = ats_info
+            raw_jobs = fetch_ats_jobs(platform, slug, company)
+            filtered = filter_ats_jobs(raw_jobs, platform, company)
+            all_jobs.extend(filtered)
+            print(f"    {company} ({platform}): {len(filtered)} after filters")
+        except Exception as e:
+            print(f"    {company}: error — {e}")
+    
+    if not all_jobs:
+        print("  [!] No backfill jobs found")
+        return
+    
+    # Qualify
+    qualified = [j for j in all_jobs if qualifier.qualifies(j)[0]]
+    print(f"  [*] {len(qualified)} qualified after filters")
+    
+    # Score and match for this one profile
+    scored = [(j, matcher.score(j, friend)) for j in qualified]
+    candidates = [(j, s) for j, s in scored if s["total"] >= 50]
+    
+    if candidates:
+        jobs_with_kw = [(j, s["total"]) for j, s in candidates]
+        ai_results = ai_matcher.score_batch(jobs_with_kw, friend)
+        scored_ai = []
+        for ai_result in ai_results:
+            if ai_result["rejected"] or ai_result["final_score"] == 0:
+                continue
+            job = ai_result["job"]
+            orig = next((s for j, s in candidates if j is job), {})
+            orig["total"] = ai_result["final_score"]
+            orig["why"] = ai_result["why"]
+            scored_ai.append((job, orig))
+        
+        picks = distributor.pick_jobs(friend["id"], scored_ai, n=5)
+        if picks:
+            write_agent_queue(friend, picks)
+            print(f"  [+] Backfill found {len(picks)} jobs for {friend['name']}")
+        else:
+            print(f"  [-] No new backfill matches for {friend['name']}")
+    else:
+        print(f"  [-] No candidates above threshold for {friend['name']}")
 
 if __name__ == "__main__":
-    main()
+    if "--backfill" in sys.argv:
+        idx = sys.argv.index("--backfill")
+        run_backfill(sys.argv[idx + 1])
+    else:
+        main()
